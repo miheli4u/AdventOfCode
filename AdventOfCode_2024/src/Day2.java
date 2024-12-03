@@ -3,19 +3,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class Main {
-
-    public static void main(String[] args) {
-
-        final String filePath = "res/PuzzleInputDay2.txt";
-
-        System.out.println("The total of safe Reports is: " + calcTotalOfSafeReports(filePath));
-
-        System.out.println("The total of safe Reports with Problem Dampener is: " + calcTotalOfSafeReportsWithProblemDampener(filePath));
-    }
+public class Day2 {
 
     // checks the total amount of safe reports of a given list of reports
-    private static int calcTotalOfSafeReports (String filePath) {
+    public static int calcTotalOfSafeReports (String filePath) {
 
         int safeReportTotal = 0;
 
@@ -45,7 +36,7 @@ public class Main {
     }
 
     // checks the total amount of safe reports of a given list of reports with the possibility to remove one unsafe level of the report
-    private static int calcTotalOfSafeReportsWithProblemDampener (String filePath) {
+    public static int calcTotalOfSafeReportsWithProblemDampener (String filePath) {
 
         int safeReportTotal = 0;
 

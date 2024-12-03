@@ -1,5 +1,3 @@
-package main;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -7,40 +5,30 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class Main {
-
-    // Calculates and prints to the console the 'total distance' and 'similarity score' between the two lists of the puzzle input
-    public static void main(String[] args) {
-
-        final String filePath = "res/PuzzleInputDay01.txt";
-
-        System.out.println(getTotalDistanceBetweenLists(filePath));
-
-        System.out.println(getSimilarityScoreBetweenLists(filePath));
-    }
+public class Day1 {
 
     // calculates the 'distance between both lists' of a given InputFilePath
-    private static int getTotalDistanceBetweenLists (String filePath) {
-        
+    public static int getTotalDistanceBetweenLists (String filePath) {
+
         ArrayList<Integer> leftNumbers = new ArrayList<>();
         ArrayList<Integer> rightNumbers = new ArrayList<>();
-        
+
         int totalDistance = 0;
 
         // add both numbers from every line of the puzzle input to separated lists
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-            
+
             int lineCounter = 0;
             String line;
             String[] numberStrings;
 
             while ((line = br.readLine()) != null) {
-                
+
                 numberStrings = line.split("   ");
 
                 leftNumbers.add(Integer.parseInt(numberStrings[0]));
                 rightNumbers.add(Integer.parseInt(numberStrings[1]));
-                
+
                 lineCounter++;
             }
         } catch (IOException e) {
@@ -49,7 +37,7 @@ public class Main {
 
         Collections.sort(leftNumbers);
         Collections.sort(rightNumbers);
-        
+
         // count the total distance between both lists
         for (int i = 0; i < leftNumbers.size(); i++) {
 
@@ -60,7 +48,7 @@ public class Main {
     }
 
     // calculates the 'similarityscore' of a given InputFilePath
-    private static int getSimilarityScoreBetweenLists(String filePath) {
+    public static int getSimilarityScoreBetweenLists(String filePath) {
 
         ArrayList<Integer> leftNumbers = new ArrayList<>();
         ArrayList<Integer> rightNumbers = new ArrayList<>();
