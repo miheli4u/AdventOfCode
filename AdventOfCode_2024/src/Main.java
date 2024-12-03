@@ -2,11 +2,10 @@ public class Main {
 
     public static void main(String[] args) {
 
-        final String filePath = "res/PuzzleInputDay2.txt";
+        final String filePath = "res/PuzzleInputDay3.txt";
 
-        System.out.println("The total of safe Reports is: " + Day2.calcTotalOfSafeReports(filePath));
+//        System.out.println("The sum of the multiplications is: " + Day3.calcProductSumFromCorruptedMemory(filePath));
 
-        System.out.println("The total of safe Reports with Problem Dampener is: " + Day2.calcTotalOfSafeReportsWithProblemDampener(filePath));
-
+        System.out.println("The sum of the multiplications with switches is: " + Day3.calcProductSumFromCorruptedMemoryWithSwitches(filePath));
     }
 }
