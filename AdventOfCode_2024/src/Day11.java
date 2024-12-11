@@ -8,10 +8,10 @@ public class Day11 {
 
     public static void main (String[] args) throws IOException {
 
-        String input = "res/PuzzleInputDay11.txt";
-        String output = "res/PuzzleOutputDay11.txt";
+        String input = "res/ExampleInputDay11.txt";
+        String output = "res/PuzzleTempOutputDay11.txt";
 
-        int timesToBlink = 75;
+        int timesToBlink = 25;
         int chunksize = 100000;
 
         long[] numbers;
@@ -33,22 +33,23 @@ public class Day11 {
 
         // write the converted list to the output
         for (int m = 0; m < newStones.size(); m++) {
-            bw.write(String.valueOf(newStones.get(m)) + "\n");
+            bw.write(String.valueOf(newStones.get(m)));
         }
 
-        // swap in- and output
-        String temp = input;
+        // swap to the pair of temp-outputfiles
         input = output;
-        output = temp;
+        output = "res/PuzzleTempOutput2Day11.txt";
 
         for (int n = 0; n < timesToBlink - 1; n++) {
-            processChunks(input, output, chunksize);
-
             // swap in- and output
-            temp = input;
+            String temp = input;
             input = output;
             output = temp;
+
+            processChunks(input, output, chunksize);
         }
+
+
 
         /*for (int k = 0; k < newStones.size(); k++) {
             System.out.println(newStones.get(k) + ",");
@@ -67,15 +68,19 @@ public class Day11 {
 
         while ((number = br.readLine()) != null) {
 
-            if (chunkElementCounter < chunksize) {
+            if (chunk.size() < chunksize) {
                 chunk.add(Long.parseLong(number));
             } else {
                 writeChunk(bw, blink(chunk));
                 chunk.clear();
             }
-
-
         }
+        writeChunk(bw, blink(chunk));
+        chunk.clear();
+
+        br.close();
+        bw.close();
+
     }
 
     public static void writeChunk (BufferedWriter bw, ArrayList<Long> chunk) throws IOException{
