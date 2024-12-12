@@ -1,122 +1,146 @@
 import java.io.*;
 import java.nio.Buffer;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 
 
 public class Day11 {
 
     public static void main (String[] args) throws IOException {
+        long stoneCount = 0L;
+        HashMap<Long, Long> stones = new HashMap<>();
+        long stone;
+        stones.put(125L, 1L);
+        stones.put(17L, 1L);
 
-        String input = "res/ExampleInputDay11.txt";
-        String output = "res/PuzzleTempOutputDay11.txt";
 
-        int timesToBlink = 25;
-        int chunksize = 100000;
 
-        long[] numbers;
+        for (int iteration = 0; iteration < 25; iteration++) {
 
-        // initial Reading
-        BufferedReader br = new BufferedReader(new FileReader(input));
+            ArrayList<Long> stonesList = new ArrayList<>();
+            for (HashMap.Entry<Long, Long> entry : stones.entrySet()) {
+                stonesList.add(entry.getKey());
+            }
+            stones.clear();
 
-        numbers = Arrays.stream(br.readLine().split(" ")).mapToLong(Long::parseLong).toArray();
+            for (int index = 0; index < stonesList.size(); index++) {
 
-        ArrayList<Long> newStones = new ArrayList<>();
+                long number = stonesList.get(index);
+                long count = stones.containsKey(number) ? stones.get(number) : 1;
+                int digits = 0;
 
-        for (int l = 0; l < numbers.length; l++) {
-            newStones.add(numbers[l]);
+                if (number == 0) {
+                    addStone(stones, 1, count);
+                    stoneCount++;
+                }
+                else {
+                    if ((digits = numberOfDigits(number)) % 2 == 0) {
+                        double divisor = Math.pow (10, digits);
+                        addStone(stones, number / (long)divisor, count);
+                        addStone(stones, number % (long) divisor, count);
+                        stoneCount += count * 2;
+                    } else {
+                        addStone(stones, number * 2024, count);
+                        stoneCount += count;
+                    }
+                }
+
+
+            }
         }
-        // initial blink
-        newStones = blink(newStones);
+        System.out.println("stoneCount = " + stoneCount);
 
-        BufferedWriter bw = new BufferedWriter(new FileWriter(output));
-
-        // write the converted list to the output
-        for (int m = 0; m < newStones.size(); m++) {
-            bw.write(String.valueOf(newStones.get(m)));
-        }
-
-        // swap to the pair of temp-outputfiles
-        input = output;
-        output = "res/PuzzleTempOutput2Day11.txt";
-
-        for (int n = 0; n < timesToBlink - 1; n++) {
-            // swap in- and output
-            String temp = input;
-            input = output;
-            output = temp;
-
-            processChunks(input, output, chunksize);
-        }
-
-
-
-        /*for (int k = 0; k < newStones.size(); k++) {
-            System.out.println(newStones.get(k) + ",");
-        }
-
-        System.out.println("newStonesLen = " + newStones.size());*/
     }
 
-    public static void processChunks (String fileInput, String fileOutput, int chunksize) throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(fileInput));
-        BufferedWriter bw = new BufferedWriter(new FileWriter(fileOutput));
+    public static int numberOfDigits (long number) {
 
-        String number;
-        ArrayList<Long> chunk = new ArrayList<>();
-        int chunkElementCounter = 0;
+        int digitCounter = 0;
+        while (number > 0) {
+            number /= 10;
+            digitCounter++;
+        }
+        return digitCounter;
+    }
 
-        while ((number = br.readLine()) != null) {
+    public static void addStone (HashMap<Long, Long> stones, long number, long add) {
 
-            if (chunk.size() < chunksize) {
-                chunk.add(Long.parseLong(number));
+        if (!stones.containsKey(number)) {
+            stones.put(number, add);
+        } else {
+            stones.put(number, stones.get(number) + add);
+        }
+    }
+
+
+
+
+    static class Stone {
+
+        public long postBlinkStoneCounter;
+        int initialNumber;
+        public Stone (int initial) {
+            this.postBlinkStoneCounter = 1;
+            this.initialNumber = initial;
+        }
+        public void blink (long number, int remainingBlinks) {
+
+            if (remainingBlinks == 0) {
+                return;
+            }
+
+            int digitCounter = 0;
+            long numberCopy = number;
+            while (numberCopy > 0) {
+                numberCopy /= 10;
+                digitCounter++;
+            }
+
+            if (number == 0) {
+                blink(1, remainingBlinks - 1);
+            } else if (digitCounter % 2 == 0) {
+                this.postBlinkStoneCounter++;
+                blink((long) (number / Math.pow((double) 10, (double) digitCounter / 2)), remainingBlinks - 1);
+                blink((long) (number % Math.pow((double) 10, (double) digitCounter / 2)), remainingBlinks - 1);
             } else {
-                writeChunk(bw, blink(chunk));
-                chunk.clear();
+                blink(number * 2024, remainingBlinks - 1);
             }
+
+        /*ArrayList<Long> stones = new ArrayList<>();
+        stones.add(number);
+        String numberString;
+
+        for (int iteration = 0; iteration < iterations; iteration++) {
+            for (int index = 0; index < stones.size(); index++) {
+                int digitCount = 0;
+                long numbercopy = stones.get(index);
+                while (numbercopy > 0) {
+                    numbercopy /= 10;
+                    digitCount++;
+                }
+
+
+                // if the stone has the number 0, replace it with a stone with the number 1
+                if (stones.get(index) == 0) {
+                    stones.set(index, 1L);
+                }
+
+                // if the number on the stone has an even number of digits, split it in two
+                else if (digitCount % 2 == 0 ) {
+                    numberString = Long.toString(stones.get(index));
+                    stones.set(index, Long.parseLong(numberString.substring(0, numberString.length() / 2)));
+                    stones.add(index + 1, Long.parseLong(numberString.substring(numberString.length() / 2)));
+                    index++;
+                }
+
+                // else multiply the number with 2024
+                else {
+                    stones.set(index, stones.get(index) * 2024);
+                }
+            }
+        }*/
         }
-        writeChunk(bw, blink(chunk));
-        chunk.clear();
-
-        br.close();
-        bw.close();
-
-    }
-
-    public static void writeChunk (BufferedWriter bw, ArrayList<Long> chunk) throws IOException{
-
-        for (int index = 0; index < chunk.size(); index++) {
-            bw.write(String.valueOf(chunk.get(index)));
-            bw.newLine();
-        }
-    }
-
-    public static ArrayList<Long> blink (ArrayList<Long> stones) {
-
-        String number;
-
-        for (int i = 0; i < stones.size(); i++) {
-
-            // if the stone has the number 0, replace it with a stone with the number 1
-            if (stones.get(i) == 0) {
-                stones.set(i, 1L);
-            }
-
-            // if the number on the stone has an even number of digits, split it in two
-            else if ((number = Long.toString(stones.get(i))).length() % 2 == 0 ) {
-
-                stones.set(i, Long.parseLong(number.substring(0, number.length() / 2)));
-                stones.add(i + 1, Long.parseLong(number.substring(number.length() / 2)));
-                i++;
-
-            }
-
-            // else multiply the number with 2024
-            else {
-                stones.set(i, stones.get(i) * 2024);
-            }
-        }
-
-        return stones;
     }
 }
+
+
+
+
