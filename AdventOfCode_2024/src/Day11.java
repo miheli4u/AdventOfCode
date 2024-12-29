@@ -1,146 +1,72 @@
-import java.io.*;
-import java.nio.Buffer;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.*;
-
 
 public class Day11 {
 
-    public static void main (String[] args) throws IOException {
-        long stoneCount = 0L;
-        HashMap<Long, Long> stones = new HashMap<>();
-        long stone;
-        stones.put(125L, 1L);
-        stones.put(17L, 1L);
+    private static String filePath = "res/PuzzleInputDay11.txt";
+    private static final boolean isExample = false;
 
+    public static void main(String[] args) throws IOException {
 
-
-        for (int iteration = 0; iteration < 25; iteration++) {
-
-            ArrayList<Long> stonesList = new ArrayList<>();
-            for (HashMap.Entry<Long, Long> entry : stones.entrySet()) {
-                stonesList.add(entry.getKey());
-            }
-            stones.clear();
-
-            for (int index = 0; index < stonesList.size(); index++) {
-
-                long number = stonesList.get(index);
-                long count = stones.containsKey(number) ? stones.get(number) : 1;
-                int digits = 0;
-
-                if (number == 0) {
-                    addStone(stones, 1, count);
-                    stoneCount++;
-                }
-                else {
-                    if ((digits = numberOfDigits(number)) % 2 == 0) {
-                        double divisor = Math.pow (10, digits);
-                        addStone(stones, number / (long)divisor, count);
-                        addStone(stones, number % (long) divisor, count);
-                        stoneCount += count * 2;
-                    } else {
-                        addStone(stones, number * 2024, count);
-                        stoneCount += count;
-                    }
-                }
-
-
-            }
+        if (isExample) {
+            filePath = "res/ExampleInputDay11.txt";
         }
-        System.out.println("stoneCount = " + stoneCount);
 
+        BufferedReader br = new BufferedReader(new FileReader(filePath));
+        String puzzleInput = br.readLine();
+
+        System.out.println(part2(puzzleInput));
     }
 
-    public static int numberOfDigits (long number) {
+    public static long part2(String puzzleInput) {
 
-        int digitCounter = 0;
-        while (number > 0) {
-            number /= 10;
-            digitCounter++;
+        Map<Long, Long> stones = new HashMap<>();
+        for (String num : puzzleInput.split(" ")) {
+            long stone = Integer.parseInt(num);
+            stones.put(stone, stones.getOrDefault(stone, 0L) + 1);
         }
-        return digitCounter;
+
+        for (int i = 0; i < 75; i++) {
+            Map<Long, Long> newStones = new HashMap<>();
+            for (Map.Entry<Long, Long> entry : stones.entrySet()) {
+                long stone = entry.getKey();
+                long count = entry.getValue();
+
+                for (Long child : mutate(stone)) {
+                    newStones.put(child, newStones.getOrDefault(child, 0L) + count);
+                }
+            }
+            stones = newStones;
+        }
+
+        long total = 0;
+        for (long count : stones.values()) {
+            total += count;
+        }
+        return total;
     }
 
-    public static void addStone (HashMap<Long, Long> stones, long number, long add) {
+    private static List<Long> mutate(long stone) {
+        List<Long> results = new ArrayList<>();
 
-        if (!stones.containsKey(number)) {
-            stones.put(number, add);
+        if (stone == 0) {
+            results.add(1L);
+            return results;
+        }
+
+        String digits = String.valueOf(stone);
+        int length = digits.length();
+        int half = length / 2;
+
+        if (length % 2 == 0) {
+            results.add(Long.parseLong(digits.substring(0, half)));
+            results.add(Long.parseLong(digits.substring(half)));
         } else {
-            stones.put(number, stones.get(number) + add);
+            results.add(stone * 2024);
         }
-    }
 
-
-
-
-    static class Stone {
-
-        public long postBlinkStoneCounter;
-        int initialNumber;
-        public Stone (int initial) {
-            this.postBlinkStoneCounter = 1;
-            this.initialNumber = initial;
-        }
-        public void blink (long number, int remainingBlinks) {
-
-            if (remainingBlinks == 0) {
-                return;
-            }
-
-            int digitCounter = 0;
-            long numberCopy = number;
-            while (numberCopy > 0) {
-                numberCopy /= 10;
-                digitCounter++;
-            }
-
-            if (number == 0) {
-                blink(1, remainingBlinks - 1);
-            } else if (digitCounter % 2 == 0) {
-                this.postBlinkStoneCounter++;
-                blink((long) (number / Math.pow((double) 10, (double) digitCounter / 2)), remainingBlinks - 1);
-                blink((long) (number % Math.pow((double) 10, (double) digitCounter / 2)), remainingBlinks - 1);
-            } else {
-                blink(number * 2024, remainingBlinks - 1);
-            }
-
-        /*ArrayList<Long> stones = new ArrayList<>();
-        stones.add(number);
-        String numberString;
-
-        for (int iteration = 0; iteration < iterations; iteration++) {
-            for (int index = 0; index < stones.size(); index++) {
-                int digitCount = 0;
-                long numbercopy = stones.get(index);
-                while (numbercopy > 0) {
-                    numbercopy /= 10;
-                    digitCount++;
-                }
-
-
-                // if the stone has the number 0, replace it with a stone with the number 1
-                if (stones.get(index) == 0) {
-                    stones.set(index, 1L);
-                }
-
-                // if the number on the stone has an even number of digits, split it in two
-                else if (digitCount % 2 == 0 ) {
-                    numberString = Long.toString(stones.get(index));
-                    stones.set(index, Long.parseLong(numberString.substring(0, numberString.length() / 2)));
-                    stones.add(index + 1, Long.parseLong(numberString.substring(numberString.length() / 2)));
-                    index++;
-                }
-
-                // else multiply the number with 2024
-                else {
-                    stones.set(index, stones.get(index) * 2024);
-                }
-            }
-        }*/
-        }
+        return results;
     }
 }
-
-
-
-
